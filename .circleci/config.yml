@@ -6,6 +6,7 @@ jobs:
 #       - working_directory: ./source_code
     steps:
       - checkout
+      - run: mkdir -p my_workspace
       - run: echo "Hello 1" > my_workspace/echo-output
       - persist_to_workspace:
           # absolute path, or relative path from working_directory
