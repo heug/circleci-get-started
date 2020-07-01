@@ -1,13 +1,15 @@
 version: 2.1
 
 jobs:
+
   build:
     docker: #macos, gpu, machine
       - image: circleci/ruby:2.4.1
     steps:
       - checkout
       - run: echo "A first hello"
-  test:
+      
+  test-unit:
     docker: #macos, gpu, machine
       - image: circleci/ruby:2.4.1
     steps:
@@ -15,12 +17,38 @@ jobs:
       - run: echo "A second hi"
       - run: sleep 5
 
+  test-lint:
+    docker: #macos, gpu, machine
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - run: echo "A linted Hello"
+      - run: sleep 5
+
+  deploy:
+    docker: #macos, gpu, machine
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - run: echo "Goodbye!"
+      - run: sleep 5
+
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build
-      - test:
+      - test-unit:
         # only run if build succeeds
           requires:
             - build
+      - test-lint:
+        # only run if build succeeds
+          requires:
+            - build
+
+      - deploy:
+        # only run if build succeeds
+          requires:
+            - test-unit
+            - test-lint
