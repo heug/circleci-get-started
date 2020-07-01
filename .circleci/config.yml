@@ -7,31 +7,46 @@ jobs:
       - image: circleci/ruby:2.4.1
     steps:
       - checkout
-      - run: echo "A first hello"
+      - run: mkdir -p my_workspace
+      - run: echo "Hello World" > my_workspace/echo-output
+      - persist_to_workspace:
+          # Absolute or relative path from working_directory
+          root: my_workspace
+          paths:
+            - echo-output
+          
       
   test-unit:
     docker: #macos, gpu, machine
       - image: circleci/ruby:2.4.1
     steps:
-      - checkout
-      - run: echo "A second hi"
-      - run: sleep 5
+      - attach_workspace:
+          at: my_workspace
+      - run: cat my_workspace/echo-output
 
   test-lint:
     docker: #macos, gpu, machine
       - image: circleci/ruby:2.4.1
     steps:
-      - checkout
-      - run: echo "A linted Hello"
-      - run: sleep 5
+      - attach_workspace:
+          at: my_workspace
+      - run: |
+          # this will fail intentionally, we'll use SSH to debug and fix
+          if [[ $(cat my_workspace/echo-output) == "Trying out workspaces" ]]; then
+            echo "It worked!";
+          else
+            echo "Nope!"; exit 1
+          fi   
 
   deploy:
     docker: #macos, gpu, machine
       - image: circleci/ruby:2.4.1
     steps:
-      - checkout
-      - run: echo "Goodbye!"
-      - run: sleep 5
+      - attach_workspace:
+          at: my_workspace
+      - run: |
+          echo "Deploying message! Ship it!"
+          cat my_workspace/echo-output
 
 workflows:
   version: 2
