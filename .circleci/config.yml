@@ -6,4 +6,5 @@ jobs:
       - image: circleci/ruby:2.4.1
     steps:
       - checkout
+      - run: exit 1
       - run: echo "A first hello"
