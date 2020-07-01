@@ -21,3 +21,6 @@ workflows:
     jobs:
       - build
       - test
+        # only run if build succeeds
+          requires:
+            - build
