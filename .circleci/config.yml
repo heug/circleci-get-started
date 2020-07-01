@@ -1,7 +1,8 @@
-version: 2
+version: 2.1
+
 jobs:
   build:
-    docker:
+    docker: #macos, gpu, machine
       - image: circleci/ruby:2.4.1
     steps:
       - checkout
