@@ -7,23 +7,36 @@ jobs:
       - image: circleci/ruby:2.4.1
     steps:
       - checkout
-      - run: echo "A first hello"
+      - run: mkdir -p my_workspace
+      - run: echo "HELLO WORLD" > my_workspace/echo-output
+      - persist_to_workspace:
+          root: my_workspace
+          paths:
+            - echo-output
       
   test-a:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
-      - checkout
-      - run: echo "A second hi"
-      - run: sleep 5
+      - attach_workspace:
+        # absolute or relative path from working_directory
+          at: my_workspace
+      - run: |
+          # this will fail intentionally, we'll use SSH to debug and fix
+          if [[ $(cat my_workspace/echo-output) == "Trying out workspaces" ]]; then
+            echo "It worked!";
+          else
+            echo "Nope!"; exit 1
+          fi   
 
   test-b:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
-      - checkout
-      - run: echo "A third salut"
-      - run: sleep 5
+      - attach_workspace:
+        # absolute or relative path from working_directory
+          at: my_workspace
+      - run: cat my_workspace/echo-output
       
   test-c:
     docker:
@@ -31,15 +44,17 @@ jobs:
     steps:
       - checkout
       - run: echo "A fourth hola"
-      - run: sleep 5
 
   deploy:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
-      - checkout
-      - run: echo "A final farewell"
-      - run: sleep 5
+      - attach_workspace:
+        # absolute or relative path from working_directory
+          at: my_workspace
+      - run: |
+          echo "Deploying!"
+          cat my_workspace/echo-output
  
 workflows:
   version: 2
