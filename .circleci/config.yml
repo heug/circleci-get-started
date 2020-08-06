@@ -23,4 +23,7 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - test
+      - test:
+          # only run if build succeeds
+          requires:
+            - build
